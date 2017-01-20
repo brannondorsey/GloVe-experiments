@@ -100,7 +100,7 @@ def parse_args():
 						default=50,
 						help='What vector GloVe vector depth to use.')
 	parser.add_argument('--glove_path', '-i',
-		                default='data',
+		                default='data/glove',
 		                help='GloVe vector file path')
 	parser.add_argument('--num_words', '-n',
 						type=int,
