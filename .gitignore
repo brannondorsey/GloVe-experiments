@@ -1,0 +1,3 @@
+data/
+!data/cache/.gitkeep
+!data/glove/.gitkeep
