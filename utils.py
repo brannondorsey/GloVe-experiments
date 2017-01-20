@@ -39,6 +39,7 @@ def get_cache_filename_from_args(args):
 def get_label_dictionaries(labels_array):
         id_to_word = dict(zip(range(len(labels_array)), labels_array))
         word_to_id = dict((v,k) for k,v in id_to_word.items())
+        return word_to_id, id_to_word
 
 def save_json(filename, results):
         with open(filename, 'w') as f:

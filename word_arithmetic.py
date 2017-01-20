@@ -1,18 +1,30 @@
 import argparse, utils, sys
 from scipy.spatial.distance import cosine
 
-def word_arithmetic(base_word, minus_word, plus_word, word_to_id, id_to_word, df):
+def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word, df):
 	'''Returns a word string that is the result of the vector arithmetic'''
 	try:
-		base_vec  = df[word_to_id[base_word]]
-		minus_vec = df[word_to_id[minus_word]]
-		plus_vec  = df[word_to_id[plus_word]]
+		start_vec  = df[word_to_id[start_word]]
+		minus_vecs = [df[word_to_id[minus_word]] for minus_word in minus_words]
+		plus_vecs  = [df[word_to_id[plus_word]] for plus_word in plus_words]
 	except KeyError as err:
-		print(err)
 		return err, None
 
-	result = base_vec - minus_vec + plus_vec
-	words = (base_word, minus_word, plus_word)
+	result = start_vec
+	
+	if minus_vecs:
+		for i, vec in enumerate(minus_vecs):
+			result = result - vec
+
+	if plus_vecs:
+		for i, vec in enumerate(plus_vecs):
+			result = result + vec
+
+	# print(result)
+	# print(df[word_to_id['king']] - df[word_to_id['man']] + df[word_to_id['woman']])
+
+	# result = start_vec - minus_vec + plus_vec
+	words = [start_word] + minus_words + plus_words
 	return None, find_nearest(words, result, id_to_word, df)
 
 def find_nearest(words, vec, id_to_word, df, method='cosine'):
@@ -29,7 +41,6 @@ def find_nearest(words, vec, id_to_word, df, method='cosine'):
 		return id_to_word[minim[1]], minim[0] # word, cosine distance
 	else:
 		raise Exception('{} is not an excepted method parameter'.format(method))
-
 
 def parse_args():
 	parser = argparse.ArgumentParser()
@@ -54,11 +65,16 @@ if __name__ == '__main__':
 	
 	df, labels_array = utils.build_word_vector_matrix(vector_file, args.num_words)
 	word_to_id, id_to_word = utils.get_label_dictionaries(labels_array)
-	err, result = word_arithmetic('king', 'man', 'woman', word_to_id, id_to_word, df)
+	err, result = word_arithmetic(start_word='president', 
+		                          minus_words=[], 
+		                          plus_words=['idiot'], 
+		                          word_to_id=word_to_id, 
+		                          id_to_word=id_to_word, 
+		                          df=df)
 
 	if result:
 		print(result)
 	else:
-		print('"{}"	not found in the dataset.')
+		print('"{}"	not found in the dataset.'.format(err))
 		
 
