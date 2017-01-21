@@ -1,7 +1,7 @@
-import argparse, utils, sys
+import argparse, utils, sys, readline
 from scipy.spatial.distance import cosine
 
-def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word, df):
+def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word, df, num_results=5):
 	'''Returns a word string that is the result of the vector arithmetic'''
 	try:
 		start_vec  = df[word_to_id[start_word]]
@@ -20,27 +20,57 @@ def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word,
 		for i, vec in enumerate(plus_vecs):
 			result = result + vec
 
-	# print(result)
-	# print(df[word_to_id['king']] - df[word_to_id['man']] + df[word_to_id['woman']])
-
 	# result = start_vec - minus_vec + plus_vec
 	words = [start_word] + minus_words + plus_words
-	return None, find_nearest(words, result, id_to_word, df)
+	return None, find_nearest(words, result, id_to_word, df, num_results)
 
-def find_nearest(words, vec, id_to_word, df, method='cosine'):
+def find_nearest(words, vec, id_to_word, df, num_results, method='cosine'):
 
 	if method == 'cosine':
-		minim = (sys.maxsize, 0) # min, index		
+		minim = [] # min, index		
 		for i, v in enumerate(df):
 			# skip the base word, its usually the closest
 			if id_to_word[i] in words:
 				continue
 			dist = cosine(vec, v)
-			if dist < minim[0]:
-				minim = (dist, i)
-		return id_to_word[minim[1]], minim[0] # word, cosine distance
+			minim.append((dist, i))
+		minim = sorted(minim, key=lambda v: v[0])
+		# return list of (word, cosine distance) tuples
+		return [(id_to_word[minim[i][1]], minim[i][0]) for i in range(num_results)]
 	else:
 		raise Exception('{} is not an excepted method parameter'.format(method))
+
+def parse_expression(expr):
+
+	split = expr.split()
+	start_word = split[0]
+	minus_words, plus_words = [], []
+	for i, token in enumerate(split[1:]):
+		if token == '+':
+			plus_words.append(split[i + 2])
+		elif token == '-':
+			minus_words.append(split[i + 2])
+	return start_word, minus_words, plus_words
+
+def process():
+	inpt = input('> ')
+	if inpt == 'exit':
+		exit()
+	start_word, minus_words, plus_words = parse_expression(inpt)
+	err, results = word_arithmetic(start_word=start_word, 
+		                          minus_words=minus_words, 
+		                          plus_words=plus_words, 
+		                          word_to_id=word_to_id, 
+		                          id_to_word=id_to_word, 
+		                          df=df)
+	if results:
+		print()
+		for res in results:
+			print(res[0]) 
+		print()
+	else:
+		print('{} not found in the dataset.'.format(err), file=sys.stderr)
+		
 
 def parse_args():
 	parser = argparse.ArgumentParser()
@@ -56,6 +86,10 @@ def parse_args():
 						type=int,
 						default=10000,
 						help='The number of lines to read from the GloVe vector file.')
+	parser.add_argument('--num_output', '-o',
+						type=int,
+						default=1,
+						help='The number of result words to display')
 	return parser.parse_args()
 
 if __name__ == '__main__':
@@ -65,16 +99,6 @@ if __name__ == '__main__':
 	
 	df, labels_array = utils.build_word_vector_matrix(vector_file, args.num_words)
 	word_to_id, id_to_word = utils.get_label_dictionaries(labels_array)
-	err, result = word_arithmetic(start_word='president', 
-		                          minus_words=[], 
-		                          plus_words=['idiot'], 
-		                          word_to_id=word_to_id, 
-		                          id_to_word=id_to_word, 
-		                          df=df)
-
-	if result:
-		print(result)
-	else:
-		print('"{}"	not found in the dataset.'.format(err))
-		
-
+	
+	while True:
+		process()
