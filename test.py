@@ -1,3 +1,0 @@
-
-inpt = input('> ')
-print(inpt == '')
