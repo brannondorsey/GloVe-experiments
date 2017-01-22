@@ -1,0 +1,3 @@
+
+inpt = input('> ')
+print(inpt == '')

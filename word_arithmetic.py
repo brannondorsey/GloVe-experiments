@@ -66,7 +66,7 @@ def process():
 	if results:
 		print()
 		for res in results:
-			print(res[0]) 
+			print(res[0].ljust(15), '     {0:.2f}'.format(res[1]))
 		print()
 	else:
 		print('{} not found in the dataset.'.format(err), file=sys.stderr)
