@@ -1,4 +1,5 @@
 import argparse, utils, sys, readline
+from termcolor import colored
 from scipy.spatial.distance import cosine
 
 def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word, df):
@@ -92,7 +93,7 @@ def game_setup(args):
 def read_players():
 	players = {}
 	while len(players.keys()) == 0:
-		print('\033[0;37;42mEnter the name of each player\033[m, seperated by commas.')
+		print('Enter the name of each player, seperated by commas.')
 		names = input('> ').split(',')
 		confirm = input('There are {} players correct? [yes]: '.format(len(names)))
 		if confirm == '' or confirm.lower() == 'yes':
@@ -161,8 +162,8 @@ def turn(gs, word_to_id, id_to_word, df, soft_score):
 		for name in answers:
 			gs['players'][name] += round(answers[name], 2)
 
-	print('Computer says {} = {}'.format(expr, answer_word))
-	print('{} wins this round.'.format(winner))
+	print('Computer says {} = {}'.format(expr, colored(answer_word, 'cyan')))
+	print('{} wins this round.'.format(colored(winner, 'green')))
 	print_standings(gs)
 
 if __name__ == '__main__':
@@ -178,4 +179,4 @@ if __name__ == '__main__':
 	while max(gs['players'].values()) < gs['winning_score']:
 		turn(gs, word_to_id, id_to_word, df, args.soft_score)
 
-	print('{} is the winner!'.format(max(gs['players'], key=gs['players'].get)))
+	print('{} is the winner!'.format(colored(max(gs['players'], key=gs['players'].get), 'green')))
