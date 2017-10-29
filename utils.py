@@ -33,8 +33,8 @@ def build_word_vector_matrix(vector_file, n_words):
 				return np.array(np_arrays), labels_array
 
 def get_cache_filename_from_args(args):
-        a = (args.vector_depth, args.num_words, args.reduction_factor, int(args.num_words * args.reduction_factor))
-        return '{}-d_{}-words_{}-reduction_{}-clusters.json'.format(*a)
+        a = (args.vector_dim, args.num_words, args.num_clusters)
+        return '{}D_{}-words_{}-clusters.json'.format(*a)
 
 def get_label_dictionaries(labels_array):
         id_to_word = dict(zip(range(len(labels_array)), labels_array))
@@ -43,7 +43,6 @@ def get_label_dictionaries(labels_array):
 
 def save_json(filename, results):
         with open(filename, 'w') as f:
-                print(results)
                 json.dump(results, f)
 
 def load_json(filename):

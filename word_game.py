@@ -12,7 +12,7 @@ def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word,
 		return err, None
 
 	result = start_vec
-	
+
 	if minus_vecs:
 		for i, vec in enumerate(minus_vecs):
 			result = result - vec
@@ -26,7 +26,7 @@ def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word,
 def find_nearest(skip_words, vec, id_to_word, df, num_results=1, method='cosine'):
 
 	if method == 'cosine':
-		minim = [] # min, index	
+		minim = [] # min, index
 		for i, v in enumerate(df):
 			# skip the base word, its usually the closest
 			if id_to_word[i] in skip_words:
@@ -41,11 +41,11 @@ def find_nearest(skip_words, vec, id_to_word, df, num_results=1, method='cosine'
 
 def eval_expression(expr, word_to_id, id_to_word, df):
 	start_word, minus_words, plus_words = parse_expression(expr)
-	err, vec = word_arithmetic(start_word=start_word, 
-		                          minus_words=minus_words, 
-		                          plus_words=plus_words, 
-		                          word_to_id=word_to_id, 
-		                          id_to_word=id_to_word, 
+	err, vec = word_arithmetic(start_word=start_word,
+		                          minus_words=minus_words,
+		                          plus_words=plus_words,
+		                          word_to_id=word_to_id,
+		                          id_to_word=id_to_word,
 		                          df=df)
 	if err == None:
 		return vec, [start_word] + minus_words + plus_words # vector, skip words
@@ -66,20 +66,25 @@ def parse_expression(expr):
 
 def parse_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--vector_depth', '-d',
+	parser.add_argument('--vector_dim', '-d',
 						type=int,
 						choices=[50, 100, 200, 300],
-						default=50,
-						help='What vector GloVe vector depth to use.')
-	parser.add_argument('--glove_path', '-i',
-		                default='data/glove',
-		                help='GloVe vector file path')
+						default=100,
+						help='What vector GloVe vector depth to use (default: 100).')
 	parser.add_argument('--num_words', '-n',
 						type=int,
 						default=10000,
-						help='The number of lines to read from the GloVe vector file.')
+						help='The number of lines to read from the GloVe vector file (default: 10000).')
 	parser.add_argument('--soft_score', '-s',
-						action='store_true')
+						action='store_true',
+						help='points are scored relative to the distance a '
+						'player\'s word is from the result of the '
+						'input expression. This is in contrast to the default '
+						'1 point per-round scoring system. Soft scoring is '
+						'recommended for a more fair-and-balanced game experience (default: false)')
+	parser.add_argument('--glove_path', '-i',
+		                default='data/glove',
+		                help='GloVe vector file path (default: data/glove)')
 	return parser.parse_args()
 
 def game_setup(args):
@@ -126,11 +131,11 @@ def print_standings(gs):
 	print()
 
 def turn(gs, word_to_id, id_to_word, df, soft_score):
-	
+
 	gs['turn_number'] += 1
 	names = list(gs['players'].keys())
 	current_player = names[(gs['turn_number'] % len(names) - 1)]
-	while True:	
+	while True:
 		expr = input('{}, please enter a word expression:\n> '.format(current_player))
 		try:
 			vec, skip_words = eval_expression(expr, word_to_id, word_to_id, df)
@@ -169,11 +174,11 @@ def turn(gs, word_to_id, id_to_word, df, soft_score):
 if __name__ == '__main__':
 
 	args = parse_args()
-	vector_file = args.glove_path + '/' + 'glove.6B.' + str(args.vector_depth) + 'd.txt'
-	
+	vector_file = args.glove_path + '/' + 'glove.6B.' + str(args.vector_dim) + 'd.txt'
+
 	df, labels_array = utils.build_word_vector_matrix(vector_file, args.num_words)
 	word_to_id, id_to_word = utils.get_label_dictionaries(labels_array)
-	
+
 	gs = game_setup(args)
 
 	while max(gs['players'].values()) < gs['winning_score']:

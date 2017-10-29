@@ -11,7 +11,7 @@ def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word,
 		return err, None
 
 	result = start_vec
-	
+
 	if minus_vecs:
 		for i, vec in enumerate(minus_vecs):
 			result = result - vec
@@ -27,7 +27,7 @@ def word_arithmetic(start_word, minus_words, plus_words, word_to_id, id_to_word,
 def find_nearest(words, vec, id_to_word, df, num_results, method='cosine'):
 
 	if method == 'cosine':
-		minim = [] # min, index		
+		minim = [] # min, index
 		for i, v in enumerate(df):
 			# skip the base word, its usually the closest
 			if id_to_word[i] in words:
@@ -52,17 +52,18 @@ def parse_expression(expr):
 			minus_words.append(split[i + 2])
 	return start_word, minus_words, plus_words
 
-def process():
+def process(num_results):
 	inpt = input('> ')
 	if inpt == 'exit':
 		exit()
 	start_word, minus_words, plus_words = parse_expression(inpt)
-	err, results = word_arithmetic(start_word=start_word, 
-		                          minus_words=minus_words, 
-		                          plus_words=plus_words, 
-		                          word_to_id=word_to_id, 
-		                          id_to_word=id_to_word, 
-		                          df=df)
+	err, results = word_arithmetic(start_word=start_word,
+		                          minus_words=minus_words,
+		                          plus_words=plus_words,
+		                          word_to_id=word_to_id,
+		                          id_to_word=id_to_word,
+		                          df=df,
+								  num_results=num_results)
 	if results:
 		print()
 		for res in results:
@@ -70,35 +71,41 @@ def process():
 		print()
 	else:
 		print('{} not found in the dataset.'.format(err), file=sys.stderr)
-		
+
 
 def parse_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--vector_depth', '-d',
+	parser.add_argument('--vector_dim', '-d',
 						type=int,
 						choices=[50, 100, 200, 300],
-						default=50,
-						help='What vector GloVe vector depth to use.')
-	parser.add_argument('--glove_path', '-i',
-		                default='data/glove',
-		                help='GloVe vector file path')
+						default=100,
+						help='What vector GloVe vector depth to use '
+						     '(default: 100).')
 	parser.add_argument('--num_words', '-n',
 						type=int,
 						default=10000,
-						help='The number of lines to read from the GloVe vector file.')
+						help='The number of lines to read from the GloVe '
+						     'vector file (default: 10000).')
 	parser.add_argument('--num_output', '-o',
 						type=int,
 						default=1,
-						help='The number of result words to display')
+						help='The number of result words to display (default: 1)')
+	parser.add_argument('--glove_path', '-i',
+		                default='data/glove',
+		                help='GloVe vector file path (default: data/glove)')
 	return parser.parse_args()
 
 if __name__ == '__main__':
 
 	args = parse_args()
-	vector_file = args.glove_path + '/' + 'glove.6B.' + str(args.vector_depth) + 'd.txt'
-	
+	vector_file = args.glove_path + '/' + 'glove.6B.' + str(args.vector_dim) + 'd.txt'
+
+	if args.num_words > 400000:
+		print('--num_words must be equal to or less than 400,000. Exiting.')
+		exit(1)
+
 	df, labels_array = utils.build_word_vector_matrix(vector_file, args.num_words)
 	word_to_id, id_to_word = utils.get_label_dictionaries(labels_array)
-	
+
 	while True:
-		process()
+		process(args.num_output)
