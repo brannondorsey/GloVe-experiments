@@ -183,3 +183,22 @@ optional arguments:
   --glove_path GLOVE_PATH, -i GLOVE_PATH
                         GloVe vector file path (default: data/glove)
 ```
+
+## License and Attribution
+
+All code is released under an [MIT license](LICENSE). You are free to copy, edit, share, or sell it under those terms.
+
+### GloVe citation
+
+Jeffrey Pennington, Richard Socher, and Christopher D. Manning. 2014. [GloVe: Global Vectors for Word Representation](https://nlp.stanford.edu/pubs/glove.pdf).
+
+```
+@inproceedings{pennington2014glove,
+  author = {Jeffrey Pennington and Richard Socher and Christopher D. Manning},
+  booktitle = {Empirical Methods in Natural Language Processing (EMNLP)},
+  title = {GloVe: Global Vectors for Word Representation},
+  year = {2014},
+  pages = {1532--1543},
+  url = {http://www.aclweb.org/anthology/D14-1162},
+}
+```
