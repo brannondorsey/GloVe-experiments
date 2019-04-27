@@ -3,3 +3,6 @@ data/
 !data/cache/.gitkeep
 !data/glove/.gitkeep
 venv/
+.vscode/
+*.pyc
+.DS_Store
