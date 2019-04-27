@@ -12,7 +12,7 @@ All three scripts use the GloVe.6B pre-trained word embeddings created from the 
 
 ## Getting Started
 
-These small experiments can be run in MacOS or Linux environments (sorry ~~not sorry~~ Windoze users).
+These small experiments can be run in MacOS or Linux environments (sorry ~~not sorry~~ Windoze users). If you'd prefer to run these experiments via Docker jump down to the [Running with Docker](#running-with-docker) section.
 
 ```bash
 # clone this repo
@@ -183,6 +183,18 @@ optional arguments:
   --glove_path GLOVE_PATH, -i GLOVE_PATH
                         GloVe vector file path (default: data/glove)
 ```
+
+## Running with Docker
+
+These experiments, and the GloVe data they use, are available via a Docker image on Docker Hub. If you have Docker installed on your machine you can pull the images and run them inside of containers instead of installing them on your host machine.
+
+```bash
+docker run --rm -it brannondorsey/glove-experiments python word_arithmetic.py
+docker run --rm -it brannondorsey/glove-experiments python word_game.py
+docker run --rm -it brannondorsey/glove-experiments python word_clustering.py
+```
+
+These images have been built for 64-bit x86 CPU architectures.
 
 ## License and Attribution
 
