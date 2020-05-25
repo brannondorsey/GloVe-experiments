@@ -31,6 +31,7 @@ def build_word_vector_matrix(vector_file, n_words):
 			np_arrays.append(np.array([float(j) for j in sr[1:]]))
 			if i == n_words - 1:
 				return np.array(np_arrays), labels_array
+		return np.array(np_arrays), labels_array
 
 def get_cache_filename_from_args(args):
         a = (args.vector_dim, args.num_words, args.num_clusters)
